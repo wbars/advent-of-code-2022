@@ -1,17 +1,19 @@
+import kotlin.math.max
+
 fun main() {
     fun part1(input: List<String>): Int {
-        return input.size
+        var acc = 0
+        var max = 0
+        for (s in input) {
+            if (s.isEmpty()) {
+                max = max(max, acc)
+                acc = 0
+            } else {
+                acc += s.toInt()
+            }
+        }
+        return max(max, acc)
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
-
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    part1(readInput("input")).println()
 }
