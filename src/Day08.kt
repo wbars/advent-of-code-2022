@@ -49,8 +49,57 @@ fun main() {
         return res
     }
 
+    fun part2(input: List<String>): Int {
+        val m = input[0].length
+        val n = input.size
+        var max = 0
+
+        for (i in 0 until n) {
+            for (j in 0 until m) {
+                var up = 0
+                val c = input[i][j]
+                for (ii in i - 1 downTo 0) {
+                    up++
+                    if (c <= input[ii][j]) {
+                        break
+                    }
+                }
+
+                var down = 0
+                for (ii in i + 1 until n) {
+                    down++
+                    if (c <= input[ii][j]) {
+                        break
+                    }
+                }
+
+                var left = 0
+                for (jj in j - 1 downTo 0) {
+                    left++
+                    if (c <= input[i][jj]) {
+                        break
+                    }
+                }
+
+                var right = 0
+                for (jj in j + 1 until m) {
+                    right++
+                    if (c <= input[i][jj]) {
+                        break
+                    }
+                }
+
+
+                max = maxOf(max, up * down * left * right)
+            }
+        }
+        return max
+    }
+
+
 
 
 
     part1(readInput("input")).println()
+    part2(readInput("input")).println()
 }
