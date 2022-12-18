@@ -6,7 +6,7 @@ class Node(val name: String, val parent: Node? = null, val children: MutableMap<
 fun main() {
     fun putNode(cur: Node, dir: String, size: Long = 0) = cur.children.computeIfAbsent(dir) { Node(dir, cur, size = size) }
 
-    fun part1(input: List<String>): Long {
+    fun buildTree(input: List<String>): Node {
         val root = Node("/")
         var cur = root
         var i = 0
@@ -28,22 +28,44 @@ fun main() {
                 }
             }
         }
+        return root
+    }
 
-        var res = 0L
-        fun dfs(root: Node): Long {
-            if (root.children.isEmpty()) {
-                return root.size
-            }
-            val sum = root.children.values.sumOf { dfs(it) }
-            if (sum <= 100000) {
-                res += sum
-            }
-            return sum
+    fun dfs(root: Node, directorySizeCallback: (Long) -> Unit): Long {
+        if (root.children.isEmpty()) {
+            return root.size
         }
-        dfs(root);
-        return res
+        val sum = root.children.values.sumOf { dfs(it, directorySizeCallback) }
+        directorySizeCallback(sum)
+        return sum
     }
 
 
+    fun part1(input: List<String>): Long {
+        val root = buildTree(input)
+        var res = 0L
+        dfs(root) {
+            if (it <= 100000) {
+                res += it
+            }
+        }
+        return res
+    }
+
+    fun part2(input: List<String>): Long {
+        val root = buildTree(input)
+        val sizes: MutableList<Long> = mutableListOf()
+        var rootSize = 0L
+        dfs(root) {
+            sizes.add(it)
+            rootSize = it
+        }
+        sizes.sort()
+        return sizes.find { 70000000 - rootSize + it >= 30000000 }!!
+    }
+
+
+
     part1(readInput("input")).println()
+    part2(readInput("input")).println()
 }
