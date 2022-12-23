@@ -1,6 +1,51 @@
 import kotlin.math.min
 
 fun main() {
+    fun solve(
+        input: List<String>,
+        iStart: Int,
+        jStart: Int,
+        iEnd: Int,
+        jEnd: Int
+    ): Int {
+        val a = Array(input.size) { IntArray(input[0].length) { Int.MAX_VALUE } }
+        a[iStart][jStart] = 0
+        val v = Array(input.size) { BooleanArray(input[0].length) { false } }
+        val prev = Array(input.size) { Array(input[0].length) { "." } }
+
+        while (true) {
+            val pp = a.findMin(v) ?: break
+            val i = pp.first
+            val j = pp.second
+            v[i][j] = true
+            for ((ii, jj) in sequenceOf(Pair(i - 1, j), Pair(i + 1, j), Pair(i, j - 1), Pair(i, j + 1))) {
+                if (ii in a.indices && jj in a[ii].indices && !v[ii][jj]) {
+                    if (input.getSafe(i, j) - input.getSafe(ii, jj) >= -1) {
+                        if (a[i][j] + 1 < a[ii][jj]) {
+                            a[ii][jj] = min(a[ii][jj], a[i][j] + 1)
+                            if (ii == i - 1) {
+                                prev[i][j] = "↑"
+                            } else if (ii == i + 1) {
+                                prev[i][j] = "↓"
+                            } else if (jj == j - 1) {
+                                prev[i][j] = "←"
+                            } else {
+                                prev[i][j] = "→"
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            if (i == iEnd && j == jEnd) {
+                break
+            }
+        }
+        println(prev.joinToString("\n", transform = { it.joinToString("") }))
+        return a[iEnd][jEnd]
+    }
+
     fun part1(input: List<String>): Int {
         var iStart = 0
         var jStart = 0
@@ -20,50 +65,37 @@ fun main() {
             }
         }
 
-        val a = Array(input.size) { IntArray(input[0].length) { Int.MAX_VALUE } }
-        a[iStart][jStart] = 0
-        val v = Array(input.size) { BooleanArray(input[0].length) { false } }
-        val prev = Array(input.size) { Array(input[0].length) { "." } }
-
-        while (true) {
-            val pp = a.findMin(v)
-            if (pp == null) {
-                break
-            }
-            val i = pp.first
-            val j = pp.second
-            v[i][j] = true
-            for ((ii, jj) in sequenceOf(Pair(i - 1, j), Pair(i + 1, j), Pair(i, j - 1), Pair(i, j + 1))) {
-                if (ii in a.indices && jj in a[ii].indices && !v[ii][jj]) {
-                    if (input.getSafe(i, j) - input.getSafe(ii, jj) >= -1) {
-                        if (a[i][j] + 1 < a[ii][jj]) {
-                            a[ii][jj] = min(a[ii][jj], a[i][j] + 1)
-                            if (ii == i - 1) {
-                                prev[i][j] = "↑"
-                            } else if (ii == i + 1) {
-                                prev[i][j] = "↓"
-                            }
-                            else if (jj == j - 1) {
-                                prev[i][j] = "←"
-                            }
-                            else {
-                                prev[i][j] = "→"
-                            }
-
-                        }
-
-                    }
-                }
-            }
-            if (i == iEnd && j == jEnd) {
-                break
-            }
-        }
-        println(prev.joinToString("\n", transform = {it.joinToString("")}))
-        return a[iEnd][jEnd]
+        return solve(input, iStart, jStart, iEnd, jEnd)
     }
 
+    fun part2(input: List<String>): Int {
+        var iEnd = 0
+        var jEnd = 0
+
+        for (i in input.indices) {
+            for (j in input[i].indices) {
+                if (input[i][j] == 'E') {
+                    iEnd = i
+                    jEnd = j
+                }
+            }
+        }
+
+        var res = Int.MAX_VALUE
+        for (i in input.indices) {
+            for (j in input[i].indices) {
+                if (input.getSafe(i, j) == 'a') {
+                    res = min(res, solve(input, i,j,iEnd, jEnd))
+                }
+            }
+        }
+
+        return res
+    }
+
+
     part1(readInput("input")).println()
+    part2(readInput("input")).println()
 }
 
 private fun List<String>.getSafe(i: Int, j: Int): Char {
