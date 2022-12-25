@@ -82,6 +82,17 @@ fun main() {
 
     }
 
+    fun part2(input: List<String>): Int {
+        val a = parseValue("[[2]]")
+        val b = parseValue("[[6]]")
+        val map = (input.filter { it.isNotEmpty() }.map { parseValue(it) } + listOf(a, b))
+            .sortedWith { f, s -> if (f.lessThan(s) == true) -1 else if (s.lessThan(f) == true) 1 else 0 }
+        return (map.indexOf(a) + 1) * (map.indexOf(b) + 1)
+
+    }
+
+
 
     part1(readInput("input")).println()
+    part2(readInput("input")).println()
 }
